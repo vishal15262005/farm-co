@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Analytics - FARM&CO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #e4e7eb);
+            min-height: 100vh;
+        }
+
+        .analytics-container {
+            max-width: 1200px;
+            margin: 6rem auto 2rem;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .health-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .health-stats {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 4px solid #27ae60;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+            outline: none;
+        }
+
+        .submit-btn {
+            background: #27ae60;
+            color: white;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .submit-btn:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);
+        }
+
+        .chart-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            grid-column: 1 / -1;
+            height: 400px;
+        }
+
+        .recommendations {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            grid-column: 1 / -1;
+        }
+
+        .recommendation-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .recommendation-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .analytics-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+        </div>
+        <div class="logo">FARM&CO</div>
+    </nav>
+
+    <div class="analytics-container">
+        <div class="health-form">
+            <h2 class="section-title">🐄 Health Assessment</h2>
+            <form id="healthForm" onsubmit="predictGrowth(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Age (months)</label>
+                        <input type="number" name="age" required min="0" placeholder="Enter age">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Weight (kg)</label>
+                        <input type="number" name="weight" required min="0" step="0.1" placeholder="Enter weight">
+                    </div>
+                    <div class="form-group">
+                        <label>Milking Status</label>
+                        <select name="milking" required>
+                            <option value="">Select status</option>
+                            <option value="yes">Currently Milking</option>
+                            <option value="no">Not Milking</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn">Analyze Health</button>
+            </form>
+        </div>
+
+        <div class="health-stats">
+            <h2 class="section-title">Current Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Growth Rate</div>
+                    <div class="stat-value" id="growthRate">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Weight Progress</div>
+                    <div class="stat-value" id="weightProgress">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Health Score</div>
+                    <div class="stat-value" id="healthScore">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Expected Weight</div>
+                    <div class="stat-value" id="expectedWeight">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="growthChart"></canvas>
+        </div>
+
+        <div class="recommendations">
+            <h2 class="section-title">Health Recommendations</h2>
+            <div class="recommendation-list" id="recommendationList">
+                <!-- Recommendations will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let growthChart;
+
+        async function predictGrowth(event) {
+            event.preventDefault();
+            const form = event.target;
+            const data = {
+                age: parseInt(form.age.value),
+                weight: parseFloat(form.weight.value),
+                milking: form.milking.value
+            };
+
+            try {
+                const response = await fetch('/predict_growth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    // Update statistics
+                    document.getElementById('growthRate').textContent = result.growth_rate;
+                    document.getElementById('weightProgress').textContent = result.weight_progress;
+                    document.getElementById('healthScore').textContent = result.health_score;
+                    document.getElementById('expectedWeight').textContent = result.expected_weight;
+
+                    // Update recommendations
+                    const recommendationList = document.getElementById('recommendationList');
+                    recommendationList.innerHTML = '';
+                    result.recommendations.forEach(rec => {
+                        recommendationList.innerHTML += `
+                            <div class="recommendation-card">
+                                <h3 style="color: #2c3e50; margin-bottom: 0.5rem">${rec.title}</h3>
+                                <p style="color: #666; margin-bottom: 0.5rem">${rec.description}</p>
+                                <p style="color: #27ae60; font-weight: 600">✓ ${rec.action}</p>
+                            </div>
+                        `;
+                    });
+
+                    // Update growth chart
+                    updateGrowthChart(data.weight, result.future_weight);
+                } else {
+                    throw new Error(result.message || 'Error analyzing data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error analyzing health data: ' + error.message);
+            }
+        }
+
+        function updateGrowthChart(currentWeight, futureWeight) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            
+            if (growthChart) {
+                growthChart.destroy();
+            }
+
+            const months = ['Current', '2 Months', '4 Months', '6 Months'];
+            const weights = [
+                currentWeight,
+                currentWeight + ((futureWeight - currentWeight) * 0.33),
+                currentWeight + ((futureWeight - currentWeight) * 0.66),
+                futureWeight
+            ];
+
+            growthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Projected Weight (kg)',
+                        data: weights,
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#27ae60'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Weight Growth Projection',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: 20
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Weight (kg)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

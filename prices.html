@@ -1,0 +1,385 @@
+prices.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Prices - FARM&CO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .page-container {
+            max-width: 1200px;
+            margin: 6rem auto 2rem;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .forms-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .price-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .history-section {
+            margin-top: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            height: 500px;
+        }
+
+        .price-history {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .price-history h3 {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .price-history p {
+            padding: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .price-history p:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .forms-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .alert-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: flex-start;
+            padding-top: 100px;
+        }
+
+        .alert-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            width: 90%;
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .close-alert {
+            position: absolute;
+            right: 1.5rem;
+            top: 1rem;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+        }
+
+        .close-alert:hover {
+            color: #000;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-content h3 {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .alert-content p {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+        </div>
+        <div class="logo">FARM&CO</div>
+    </nav>
+
+    <div class="page-container">
+        <div class="forms-container">
+            <div class="price-section">
+                <h2>Set Price Alert</h2>
+                <form id="alertForm" onsubmit="setAlert(event)">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" name="product_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Alert Price (₹)</label>
+                        <input type="number" name="alert_price" step="0.01" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Set Alert</button>
+                </form>
+            </div>
+
+            <div class="price-section">
+                <h2>Add New Price</h2>
+                <form id="priceForm" onsubmit="addPrice(event)">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" name="product_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Current Price (₹)</label>
+                        <input type="number" name="price" step="0.01" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Add Price</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <div class="price-history" id="priceHistory">
+                <h3>Recent Prices</h3>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <canvas id="priceChart"></canvas>
+        </div>
+    </div>
+
+    <div class="alert-popup" id="alertPopup">
+        <div class="alert-content">
+            <span class="close-alert" onclick="closeAlert()">&times;</span>
+            <h3>🔔 Price Alert!</h3>
+            <p id="alertMessage"></p>
+            <button onclick="closeAlert()" class="submit-btn" style="max-width: 200px; margin: 1rem auto;">OK</button>
+        </div>
+    </div>
+
+    <script>
+        let priceChart;
+
+        async function setAlert(event) {
+            event.preventDefault();
+            const form = event.target;
+            const data = {
+                product_name: form.product_name.value,
+                alert_price: form.alert_price.value
+            };
+
+            try {
+                const response = await fetch('/set-alert', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Price alert set successfully!');
+                    form.reset();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error setting price alert');
+            }
+        }
+
+        async function addPrice(event) {
+            event.preventDefault();
+            const form = event.target;
+            const data = {
+                product_name: form.product_name.value,
+                price: form.price.value
+            };
+
+            try {
+                const response = await fetch('/add-price', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                
+                if (result.triggered_alerts.length > 0) {
+                    const alert = result.triggered_alerts[0];
+                    document.getElementById('alertMessage').innerHTML = 
+                        `The price of ${alert.product} (₹${alert.current_price}) is now higher than your alert price (₹${alert.alert_price})!`;
+                    document.getElementById('alertPopup').style.display = 'block';
+                }
+                
+                form.reset();
+                updatePriceHistory();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error adding price');
+            }
+        }
+
+        function closeAlert() {
+            document.getElementById('alertPopup').style.display = 'none';
+        }
+
+        async function updatePriceHistory() {
+            try {
+                // Get prices and alerts
+                const [pricesResponse, alertsResponse] = await Promise.all([
+                    fetch('/get-prices'),
+                    fetch('/get-alerts')
+                ]);
+                
+                const prices = await pricesResponse.json();
+                const alerts = await alertsResponse.json();
+
+                // Update price history list
+                const history = document.getElementById('priceHistory');
+                history.innerHTML = '<h3>Recent Prices</h3>';
+                prices.forEach(price => {
+                    history.innerHTML += `
+                        <p>${price.product_name}: ₹${price.price} 
+                           <small>(${new Date(price.created_at).toLocaleDateString()})</small></p>
+                    `;
+                });
+
+                // Update chart
+                updateChart(prices, alerts);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function updateChart(prices, alerts) {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            
+            // Process data for chart
+            const products = [...new Set([
+                ...prices.map(p => p.product_name),
+                ...alerts.map(a => a.product_name)
+            ])];
+
+            const marketPrices = products.map(product => {
+                const productPrices = prices.filter(p => p.product_name === product);
+                return productPrices[productPrices.length - 1]?.price || 0;
+            });
+            
+            const alertPrices = products.map(product => {
+                const productAlert = alerts.find(a => a.product_name === product);
+                return productAlert?.alert_price || 0;
+            });
+
+            // Determine bar colors based on price comparison
+            const marketColors = marketPrices.map((price, index) => 
+                price > alertPrices[index] ? 'rgba(231, 76, 60, 0.7)' : 'rgba(39, 174, 96, 0.7)'
+            );
+
+            // Destroy existing chart if it exists
+            if (priceChart) {
+                priceChart.destroy();
+            }
+
+            // Create new chart
+            priceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: products,
+                    datasets: [
+                        {
+                            label: 'Current Market Price',
+                            data: marketPrices,
+                            backgroundColor: marketColors,
+                            borderColor: marketColors.map(c => c.replace('0.7', '1')),
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Alert Price',
+                            data: alertPrices,
+                            backgroundColor: 'rgba(41, 128, 185, 0.7)',
+                            borderColor: 'rgba(41, 128, 185, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Price (₹)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Market Prices vs Alert Prices',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: 20
+                        },
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update price history on page load
+        updatePriceHistory();
+    </script>
+</body>
+</html>

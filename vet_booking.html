@@ -1,0 +1,297 @@
+booking.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Veterinary Appointment - FARM&CO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .booking-container {
+            max-width: 1200px;
+            margin: 6rem auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .booking-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .form-header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .form-section {
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #27ae60;
+            box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+            outline: none;
+        }
+
+        .vet-cards-section {
+            padding: 2rem;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .vet-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .vet-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .vet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .vet-card.selected {
+            border-color: #27ae60;
+            background: #f0fff4;
+        }
+
+        .vet-card h4 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .vet-card p {
+            color: #666;
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            width: 100%;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(37, 211, 102, 0.2);
+        }
+
+        @media (max-width: 968px) {
+            .booking-grid {
+                grid-template-columns: 1fr;
+            }
+            .booking-form {
+                padding: 2rem;
+            }
+            .form-section, .vet-cards-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+        </div>
+        <div class="logo">FARM&CO</div>
+    </nav>
+
+    <div class="booking-container">
+        <div class="booking-form">
+            <div class="form-header">
+                <h1>🏥 Book Veterinary Appointment</h1>
+                <p>Connect with expert veterinarians for your livestock care needs</p>
+            </div>
+
+            <form id="appointmentForm" onsubmit="submitAppointment(event)">
+                <div class="booking-grid">
+                    <div class="form-section">
+                        <h3>Personal Details</h3>
+                        <div class="form-group">
+                            <label>Your Name</label>
+                            <input type="text" name="farmer_name" required placeholder="Enter your full name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" name="phone" required placeholder="Your WhatsApp number">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Preferred Date</label>
+                            <input type="date" name="date" required min="<?php echo date('Y-m-d'); ?>">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Preferred Time</label>
+                            <input type="time" name="time" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Reason for Visit</label>
+                            <textarea name="reason" required rows="4" placeholder="Please describe the health issue or concern..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="vet-cards-section">
+                        <h3>Select Veterinarian</h3>
+                        <div class="vet-cards">
+                            <div class="vet-card" onclick="selectVet(this, '917810065192')">
+                                <h4>Dr. Ramesh Kumar</h4>
+                                <p>📚 Speciality: Large Animals</p>
+                                <p>📍 Chennai</p>
+                                <p>⭐ 4.9/5 Rating</p>
+                            </div>
+                            <div class="vet-card" onclick="selectVet(this, '918939565678')">
+                                <h4>Dr. Priya Sharma</h4>
+                                <p>📚 Speciality: Cattle Disease</p>
+                                <p>📍 Bengaluru</p>
+                                <p>⭐ 4.8/5 Rating</p>
+                            </div>
+                            <div class="vet-card" onclick="selectVet(this, '919043097300')">
+                                <h4>Dr. Suresh Singh</h4>
+                                <p>📚 Speciality: Bovine Medicine</p>
+                                <p>📍 Coimbatore</p>
+                                <p>⭐ 4.7/5 Rating</p>
+                            </div>
+                            <div class="vet-card" onclick="selectVet(this, '919952505042')">
+                                <h4>Dr. Sathvika Raghavi</h4>
+                                <p>📚 Speciality: Animal Nutrition</p>
+                                <p>📍 Salem</p>
+                                <p>⭐ 4.9/5 Rating</p>
+                            </div>
+                        </div>
+                        <input type="hidden" name="vet_number" required>
+                        <button type="submit" class="whatsapp-btn">
+                            <span>📱</span> Book Appointment via WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function selectVet(card, number) {
+            document.querySelectorAll('.vet-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            document.querySelector('input[name="vet_number"]').value = number;
+        }
+
+        async function submitAppointment(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            if (!data.vet_number) {
+                alert('Please select a veterinarian');
+                return;
+            }
+
+            try {
+                const response = await fetch('/vet-booking', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (result.whatsapp_link) {
+                    window.location.href = result.whatsapp_link;
+                } else {
+                    alert('Error: Could not generate WhatsApp link');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error booking appointment');
+            }
+        }
+    </script>
+</body>
+</html>

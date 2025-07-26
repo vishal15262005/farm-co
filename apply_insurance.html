@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply Insurance - FARM&CO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .apply-container {
+            max-width: 800px;
+            margin: 6rem auto 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .contact-info {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            text-align: left;
+        }
+
+        .contact-card {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-left: 4px solid #27ae60;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .apply-btn {
+            display: inline-block;
+            background: #27ae60;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .apply-btn:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+        </div>
+        <div class="logo">FARM&CO</div>
+    </nav>
+
+    <div class="apply-container">
+        <h2>Apply for Livestock Insurance</h2>
+        <p>To apply for livestock insurance, you can:</p>
+
+        <div class="contact-info">
+            <div class="contact-card">
+                <h3>Visit Nearest Office 🏢</h3>
+                <p>Regional Livestock Insurance Office</p>
+                <p>123 Agriculture Complex, Anna Nagar</p>
+                <p>Chennai - 600040</p>
+            </div>
+
+            <div class="contact-card">
+                <h3>Contact Helpline ☎️</h3>
+                <p>Toll Free: 1800-425-1556</p>
+                <p>Email: support@tnlivestockinsurance.gov.in</p>
+            </div>
+
+            <div class="contact-card">
+                <h3>Required Documents 📄</h3>
+                <ul>
+                    <li>Aadhaar Card</li>
+                    <li>Bank Account Details</li>
+                    <li>Cattle Registration Certificate</li>
+                    <li>Recent Photographs of Cattle</li>
+                    <li>Veterinary Health Certificate</li>
+                </ul>
+            </div>
+        </div>
+
+        <p>For online application, click below:</p>
+        <button onclick="openPortal()" class="apply-btn">
+            Apply Online 🌐
+        </button>
+    </div>
+
+    <script>
+    async function openPortal() {
+        try {
+            await fetch('/open-tn-portal');
+        } catch (error) {
+            console.error('Error:', error);
+            // Fallback if server route fails
+            window.open('https://tnlda.tn.gov.in/index.php', '_blank');
+        }
+    }
+    </script>
+</body>
+</html>
