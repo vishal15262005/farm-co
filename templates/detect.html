@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Detection - FARM&CO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .detection-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .upload-section, .camera-section {
+            margin: 2rem 0;
+            padding: 2rem;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .result-section {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .result-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result-text {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            color: #2c3e50;
+        }
+        .precautions-list {
+            text-align: left;
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        .precautions-list li {
+            margin: 0.5rem 0;
+            color: #e74c3c;
+        }
+        .error-message {
+            color: #e74c3c;
+            padding: 1rem;
+            background: #ffe6e6;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+        .image-container {
+            margin: 2rem auto;
+            max-width: 600px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .result-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px;
+        }
+        .camera-buttons {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        #video {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .button {
+            background: #27ae60;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .button:hover:not(:disabled) {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .popup-content {
+            cursor: default;
+            position: relative;
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 2rem;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 1.5rem;
+            top: 1rem;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+            z-index: 1001;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .result-details {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #27ae60;
+            color: white;
+            border-radius: 20px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">FARM&CO</div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <!-- Other navigation links -->
+        </div>
+    </nav>
+
+    <div class="detection-container">
+        <h2>Disease Detection</h2>
+        
+        <div class="upload-section">
+            <h3>Upload Image</h3>
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <button type="submit" class="button">Analyze Image</button>
+            </form>
+        </div>
+
+        <div class="camera-section">
+            <h3>Or Use Camera</h3>
+            <video id="video" width="400" height="300" autoplay></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <div class="camera-buttons">
+                <button onclick="startCamera()" class="button">Start Camera</button>
+                <button onclick="captureImage()" class="button capture-btn" disabled>Capture Image</button>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="error-message">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if image_uploaded %}
+        <div class="result-section">
+            <!-- Update image styling -->
+            <div class="image-container">
+                <img src="{{ url_for('static', filename=file_path) }}" 
+                     alt="Analyzed Image" 
+                     class="result-image">
+            </div>
+            <div class="result-text">
+                <h3>{{ result_display }}</h3>
+                <p class="confidence">Confidence: {{ confidence }}%</p>
+                <p class="message">{{ message }}</p>
+                {% if precautions %}
+                <div class="precautions">
+                    <h4>Recommended Precautions:</h4>
+                    <ul class="precautions-list">
+                        {% for precaution in precautions %}
+                        <li>{{ precaution }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Add this HTML for the popup -->
+    <div id="resultPopup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn">&times;</span>
+            <h2>Disease Detection Results</h2>
+            <div id="popupResults"></div>
+        </div>
+    </div>
+
+    <script>
+        let video = document.getElementById('video');
+        let canvas = document.getElementById('canvas');
+        let captureBtn = document.querySelector('.capture-btn');
+        let stream = null;
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                captureBtn.disabled = false;
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                alert("Could not access camera. Please ensure camera permissions are granted.");
+            }
+        }
+
+        async function captureImage() {
+            if (!stream) return;
+
+            try {
+                const context = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                const imageData = canvas.toDataURL('image/jpeg');
+
+                // Stop camera stream
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                captureBtn.disabled = true;
+
+                const response = await fetch('/capture', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: imageData })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                // Show results in popup
+                const popup = document.getElementById('resultPopup');
+                const popupResults = document.getElementById('popupResults');
+                
+                popupResults.innerHTML = `
+                    <div class="result-grid">
+                        <div class="captured-image">
+                            <img src="${result.file_path}" alt="Analyzed Image" style="width: 100%; border-radius: 12px;">
+                        </div>
+                        <div class="result-details">
+                            <h3>${result.result_display}</h3>
+                            <div class="confidence-badge">
+                                Confidence: ${(result.confidence).toFixed(2)}%
+                            </div>
+                            <p class="message">${result.message}</p>
+                            ${result.precautions ? `
+                                <div class="precautions">
+                                    <h4>Recommended Precautions:</h4>
+                                    <ul class="precautions-list">
+                                        ${result.precautions.map(p => `<li>${p}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                popup.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error processing image: ' + error.message);
+            }
+        }
+
+        // Add this code after your existing JavaScript
+        document.querySelector('.close-btn').addEventListener('click', function() {
+            document.getElementById('resultPopup').style.display = 'none';
+        });
+
+        // Also close popup when clicking outside
+        document.getElementById('resultPopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

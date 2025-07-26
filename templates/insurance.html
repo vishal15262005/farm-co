@@ -1,0 +1,271 @@
+/insurance.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livestock Insurance - FARM&CO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+        }
+
+        .insurance-container {
+            max-width: 1200px;
+            margin: 6rem auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .insurance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .info-section, .calculator-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .scheme-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #27ae60;
+            transition: transform 0.3s ease;
+        }
+
+        .scheme-card:hover {
+            transform: translateX(5px);
+        }
+
+        .scheme-card h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .scheme-details {
+            margin: 0.5rem 0;
+            color: #666;
+        }
+
+        .calculator-form {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+            outline: none;
+        }
+
+        .calculate-btn {
+            background: #27ae60;
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calculate-btn:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f0fff4;
+            border-radius: 8px;
+            border: 2px solid #27ae60;
+            display: none;
+        }
+
+        .apply-btn {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .apply-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 968px) {
+            .insurance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+        </div>
+        <div class="logo">FARM&CO</div>
+    </nav>
+
+    <div class="insurance-container">
+        <div class="insurance-grid">
+            <div class="info-section">
+                <h2 class="section-header">🛡️ Tamil Nadu Livestock Insurance Schemes</h2>
+                
+                <div class="scheme-card">
+                    <h3>Basic Livestock Insurance</h3>
+                    <p class="scheme-details">🏷️ Premium: 3% of animal value</p>
+                    <p class="scheme-details">💰 Government Subsidy: 40% of premium</p>
+                    <p class="scheme-details">⏱️ Coverage Period: 1 year</p>
+                    <p class="scheme-details">🎯 Eligibility: All farmers with healthy cattle</p>
+                </div>
+
+                <div class="scheme-card">
+                    <h3>Comprehensive Coverage</h3>
+                    <p class="scheme-details">🏷️ Premium: 4.5% of animal value</p>
+                    <p class="scheme-details">💰 Government Subsidy: 50% of premium</p>
+                    <p class="scheme-details">⏱️ Coverage Period: 3 years</p>
+                    <p class="scheme-details">🎯 Eligibility: Commercial dairy farmers</p>
+                </div>
+
+                <div class="scheme-card">
+                    <h3>Special Scheme for Indigenous Breeds</h3>
+                    <p class="scheme-details">🏷️ Premium: 2.5% of animal value</p>
+                    <p class="scheme-details">💰 Government Subsidy: 60% of premium</p>
+                    <p class="scheme-details">⏱️ Coverage Period: 1 year</p>
+                    <p class="scheme-details">🎯 Eligibility: Farmers with native breed cattle</p>
+                </div>
+
+                <div class="scheme-card important-dates">
+                    <h3>📅 Important Dates 2024</h3>
+                    <div class="date-info">
+                        <p class="scheme-details">
+                            <span class="date-label">🟢 Application Start Date:</span> 
+                            January 15, 2024
+                        </p>
+                        <p class="scheme-details">
+                            <span class="date-label">🔴 Application Deadline:</span> 
+                            March 31, 2024
+                        </p>
+                        <p class="scheme-details">
+                            <span class="date-label">⏳ Policy Period:</span>
+                            April 1, 2024 - March 31, 2025
+                        </p>
+                        <p class="scheme-details highlight-note">
+                            <span>⚠️ Note:</span> Applications after deadline may be subject to late fees and additional verification
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calculator-section">
+                <h2 class="section-header">💰 Premium Calculator</h2>
+                
+                <div class="calculator-form">
+                    <div class="form-group">
+                        <label>Livestock Value (₹)</label>
+                        <input type="number" id="livestockValue" placeholder="Enter the value of your livestock">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Scheme</label>
+                        <select id="schemeType" class="form-control">
+                            <option value="basic">Basic Livestock Insurance (3%)</option>
+                            <option value="comprehensive">Comprehensive Coverage (4.5%)</option>
+                            <option value="indigenous">Indigenous Breeds Scheme (2.5%)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="calculatePremium()" class="calculate-btn">Calculate Premium</button>
+
+                    <div id="resultBox" class="result-box">
+                        <h3>Premium Details</h3>
+                        <p id="totalPremium"></p>
+                        <p id="subsidyAmount"></p>
+                        <p id="finalPremium"></p>
+                        <a href="/apply-insurance" class="apply-btn">Apply Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculatePremium() {
+            const livestockValue = parseFloat(document.getElementById('livestockValue').value);
+            const schemeType = document.getElementById('schemeType').value;
+            
+            let premiumRate, subsidyRate;
+            
+            switch(schemeType) {
+                case 'basic':
+                    premiumRate = 0.03;
+                    subsidyRate = 0.4;
+                    break;
+                case 'comprehensive':
+                    premiumRate = 0.045;
+                    subsidyRate = 0.5;
+                    break;
+                case 'indigenous':
+                    premiumRate = 0.025;
+                    subsidyRate = 0.6;
+                    break;
+            }
+
+            const totalPremium = livestockValue * premiumRate;
+            const subsidyAmount = totalPremium * subsidyRate;
+            const finalPremium = totalPremium - subsidyAmount;
+
+            document.getElementById('totalPremium').textContent = `Total Premium: ₹${totalPremium.toFixed(2)}`;
+            document.getElementById('subsidyAmount').textContent = `Government Subsidy: ₹${subsidyAmount.toFixed(2)}`;
+            document.getElementById('finalPremium').textContent = `Final Premium to Pay: ₹${finalPremium.toFixed(2)}`;
+            
+            document.getElementById('resultBox').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

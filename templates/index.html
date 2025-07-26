@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARM&CO AI Disease Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .hero {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 6rem 2rem;
+            text-align: center;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .features {
+            padding: 4rem 2rem 2rem;  /* Reduced bottom padding */
+            margin-bottom: 2rem;      /* Reduced margin */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-title {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .cta-button:hover {
+            background: #219a52;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #27ae60;
+        }
+
+        .navbar {
+            background: #2c3e50;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .news-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .news-header {
+            background: #2c3e50;
+            color: white;
+            padding: 0.5rem 1rem;
+            text-align: center;
+        }
+
+        .news-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .news-container {
+            padding: 0.5rem;
+            overflow: hidden;
+            background: white;
+        }
+
+        .news-scroll {
+            display: flex;
+            animation: scroll 30s linear infinite;
+        }
+
+        .news-item {
+            white-space: nowrap;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .news-tag {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .news-tag.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .news-tag.price {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .news-tag.scheme {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .news-tag.weather {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .news-tag.tips {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .health-dashboard {
+            padding: 2rem;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            margin-bottom: 5rem;
+            border: none;
+            color: white;
+        }
+
+        .dashboard-title {
+            text-align: center;
+            color: white;
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .dashboard-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #38ef7d, #11998e);
+            border-radius: 4px;
+            animation: gradientFlow 3s linear infinite;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #1e3c72;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .dashboard-card:hover::before {
+            opacity: 1;
+        }
+
+        .dashboard-card h3 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Recent Scans Styling */
+        .scan-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .scan-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .scan-item:hover {
+            transform: translateX(5px);
+            border-color: rgba(0,0,0,0.1);
+        }
+
+        .scan-item.healthy {
+            background: linear-gradient(45deg, rgba(56, 239, 125, 0.1), rgba(255, 255, 255, 0.1));
+            border-left: 4px solid #38ef7d;
+            border-bottom: 1px solid rgba(56, 239, 125, 0.2);
+        }
+
+        .scan-item.infected {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.1), rgba(255, 255, 255, 0.1));
+            border-left: 4px solid #ff6b6b;
+            border-bottom: 1px solid rgba(255, 107, 107, 0.2);
+        }
+
+        .scan-info h4, .scan-info p {
+            color: white;
+        }
+
+        .scan-info small {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Alerts Summary Styling */
+        .alerts-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .alert-stat {
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-stat:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .alert-stat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #38ef7d, #11998e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-stat p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Reminders Styling */
+        .reminder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .reminder-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .reminder-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .reminder-item.urgent {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.1), rgba(255, 255, 255, 0.1));
+            border-left: 4px solid #ff6b6b;
+            position: relative;
+        }
+
+        .reminder-item.urgent::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 4px;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #ff6b6b, transparent);
+        }
+
+        .reminder-icon {
+            font-size: 1.5rem;
+            animation: pulse 2s infinite;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .dashboard-title:after {
+            background: linear-gradient(90deg, #11998e, #38ef7d, #11998e);
+            height: 4px;
+            border-radius: 4px;
+            animation: gradientFlow 3s linear infinite;
+        }
+
+        @media (max-width: 768px) {
+            .health-dashboard {
+                padding: 2rem 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .alerts-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">FARM&CO</div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <!-- Other navigation links -->
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>FARM&CO - AI BASED LIVESTOCK DISEASE DETECTION APP</h1>
+        <p>An AI-powered platform for early disease detection, veterinary support, and comprehensive livestock health management</p>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3 class="feature-title">Disease Detection</h3>
+            <p class="feature-description">Advanced AI technology that detects skin diseases in livestock through image analysis with high accuracy.</p>
+            <a href="/detect" class="cta-button">Try Detection</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">👨‍⚕️</div>
+            <h3 class="feature-title">Veterinary Support</h3>
+            <p class="feature-description">Connect with qualified veterinarians instantly. Get expert advice and ensure proper treatment.</p>
+            <a href="/veterinary" class="cta-button">Find Vet</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3 class="feature-title">AI Chat Assistant</h3>
+            <p class="feature-description">Get immediate answers to your livestock care questions with our AI-powered assistant.</p>
+            <a href="/chat" class="cta-button">Start Chat</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Health Analytics</h3>
+            <p class="feature-description">Track and analyze your livestock's health metrics over time with detailed insights.</p>
+            <a href="/analytics" class="cta-button">View Analytics</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🏥</div>
+            <h3 class="feature-title">Book Vet Appointment</h3>
+            <p class="feature-description">Schedule veterinary consultations easily with real-time availability and instant WhatsApp confirmations.</p>
+            <a href="/vet-booking" class="cta-button">Book Now</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3 class="feature-title">Livestock Insurance</h3>
+            <p class="feature-description">Access government schemes, calculate premiums, and protect your livestock with comprehensive coverage.</p>
+            <a href="/insurance" class="cta-button">Get Insurance</a>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <h3 class="feature-title">Price Monitoring</h3>
+            <p class="feature-description">Set price alerts for your livestock products and get notified when prices rise above your target.</p>
+            <a href="/prices" class="cta-button">Monitor Prices</a>
+        </div>
+    </section>
+
+    <section class="health-dashboard">
+        <h2 class="dashboard-title">📊 Health Summary Dashboard</h2>
+        
+        <div class="dashboard-grid">
+            <!-- Recent Scans -->
+            <div class="dashboard-card">
+                <h3>🔬 Recent Disease Scans</h3>
+                <div class="scan-list">
+                    <div class="scan-item healthy">
+                        <span class="scan-icon">✅</span>
+                        <div class="scan-info">
+                            <h4>Cow #123</h4>
+                            <p>Healthy</p>
+                            <small>Scanned 2 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="scan-item infected">
+                        <span class="scan-icon">⚠️</span>
+                        <div class="scan-info">
+                            <h4>Cow #118</h4>
+                            <p>LSD Detected</p>
+                            <small>Scanned 1 day ago</small>
+                        </div>
+                    </div>
+                    <div class="scan-item healthy">
+                        <span class="scan-icon">✅</span>
+                        <div class="scan-info">
+                            <h4>Cow #115</h4>
+                            <p>Healthy</p>
+                            <small>Scanned 2 days ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Summary -->
+            <div class="dashboard-card">
+                <h3>🚨 Active Alerts</h3>
+                <div class="alerts-summary">
+                    <div class="alert-stat">
+                        <span class="stat-number">3</span>
+                        <p>Health Alerts</p>
+                    </div>
+                    <div class="alert-stat">
+                        <span class="stat-number">2</span>
+                        <p>Price Alerts</p>
+                    </div>
+                    <div class="alert-stat">
+                        <span class="stat-number">1</span>
+                        <p>Weather Alerts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reminders -->
+            <div class="dashboard-card">
+                <h3>⏰ Today's Reminders</h3>
+                <div class="reminder-list">
+                    <div class="reminder-item urgent">
+                        <span class="reminder-icon">🔔</span>
+                        <p>Recheck Cow #118 for LSD symptoms</p>
+                    </div>
+                    <div class="reminder-item">
+                        <span class="reminder-icon">💉</span>
+                        <p>Vaccination due for Cow #123</p>
+                    </div>
+                    <div class="reminder-item">
+                        <span class="reminder-icon">👨‍⚕️</span>
+                        <p>Vet appointment at 2:00 PM</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="news-banner">
+        <div class="news-header">
+            <h3>📰 Latest Agriculture News</h3>
+        </div>
+        <div class="news-container">
+            <div class="news-scroll">
+                <div class="news-item">
+                    <span class="news-tag warning">⚠️ Alert</span>
+                    Foot and Mouth Disease vaccination drive in Tamil Nadu districts starting next week
+                </div>
+                <div class="news-item">
+                    <span class="news-tag price">💰 Market</span>
+                    Cattle feed prices expected to stabilize by month end
+                </div>
+                <div class="news-item">
+                    <span class="news-tag scheme">🏛️ Government</span>
+                    New livestock insurance scheme announced with increased subsidy for small farmers
+                </div>
+                <div class="news-item">
+                    <span class="news-tag weather">🌤️ Weather</span>
+                    Heavy rainfall predicted in coastal regions - Keep livestock sheltered
+                </div>
+                <div class="news-item">
+                    <span class="news-tag tips">💡 Expert Tips</span>
+                    TANUVAS releases new guidelines for summer cattle care
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

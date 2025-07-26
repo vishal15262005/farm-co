@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veterinary Assistance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .vet-card {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        .vet-card strong {
+            color: #2980b9;
+        }
+        .vet-card a {
+            text-decoration: none;
+            color: #27ae60;
+        }
+        .section {
+            background: white;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        .search-btn, .call-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #e74c3c;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .search-btn:hover {
+            background: #c0392b;
+        }
+        .call-btn {
+            background: #3498db;
+        }
+        .call-btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🐾 Veterinary Assistance 🏥</h2>
+
+        <!-- ✅ List of Veterinarians -->
+        <div class="vet-card">
+            <strong>Dr. Ramesh Kumar</strong> <br>
+            📍 Chennai Vet Care, Anna Nagar, Chennai <br>
+            📞 <a href="tel:+919876543210">+91 98765 43210</a> | 📧 <a href="mailto:ramesh.vet@gmail.com">ramesh.vet@gmail.com</a>
+        </div>
+
+        <div class="vet-card">
+            <strong>Dr. Priya Sharma</strong> <br>
+            📍 Happy Pets Clinic, MG Road, Bengaluru <br>
+            📞 <a href="tel:+919876543211">+91 98765 43211</a> | 📧 <a href="mailto:priya.vet@gmail.com">priya.vet@gmail.com</a>
+        </div>
+
+        <div class="vet-card">
+            <strong>Dr. Arvind Mehta</strong> <br>
+            📍 Greenfield Pet Hospital, Pune <br>
+            📞 <a href="tel:+919876543212">+91 98765 43212</a> | 📧 <a href="mailto:arvind.vet@gmail.com">arvind.vet@gmail.com</a>
+        </div>
+
+        <!-- ✅ Emergency Helpline -->
+        <div class="section">
+            <h3>🚨 Emergency Helpline Numbers</h3>
+            <p>Call these numbers in case of an animal emergency:</p>
+            <ul>
+                <li>🐾 **Animal Welfare Helpline**: <a href="tel:18001234567">1800-123-4567</a></li>
+                <li>🚑 **24/7 Pet Ambulance**: <a href="tel:18009876543">1800-987-6543</a></li>
+                <li>📍 **Govt. Veterinary Helpline**: <a href="tel:112">112</a></li>
+            </ul>
+            <button class="call-btn" onclick="callEmergency()">📞 Call Emergency Helpline</button>
+        </div>
+
+        <!-- ✅ Veterinary First Aid Tips -->
+        <div class="section">
+            <h3>🐶 First Aid for Pets & Cattle</h3>
+            <p>Basic first-aid steps before visiting the vet:</p>
+            <ul>
+                <li>🐕 **For Injuries**: Clean wounds with antiseptic.</li>
+                <li>🥵 **For Heatstroke**: Keep the animal in shade and offer water.</li>
+                <li>🐄 **For Digestive Issues**: Feed fiber-rich food and avoid dairy.</li>
+                <li>🐱 **For Poisoning**: Contact the vet immediately, don’t induce vomiting.</li>
+            </ul>
+        </div>
+
+        <!-- ✅ Common Animal Diseases -->
+        <div class="section">
+            <h3>⚠️ Common Diseases & Symptoms</h3>
+            <ul>
+                <li>🐮 **Foot and Mouth Disease**: High fever, blisters in the mouth.</li>
+                <li>🐕 **Rabies**: Aggression, foaming at the mouth.</li>
+                <li>🐓 **Bird Flu**: Coughing, loss of appetite.</li>
+                <li>🐐 **Mastitis (Cows & Goats)**: Swelling in the udder.</li>
+            </ul>
+        </div>
+
+        <!-- ✅ Find Nearby Vets -->
+        <button class="search-btn" onclick="searchNearbyVets()">🔍 Find Nearby Vets</button>
+    </div>
+
+    <script>
+        function searchNearbyVets() {
+            window.open("https://www.google.com/maps/search/nearby+veterinary+clinic", "_blank");
+        }
+
+        function callEmergency() {
+            window.location.href = "tel:112";
+        }
+    </script>
+
+</body>
+</html>
